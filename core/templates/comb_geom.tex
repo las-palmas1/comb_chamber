@@ -1,0 +1,257 @@
+%%
+%% Author: Alexander
+%% 12.06.2018
+%%
+
+% Preamble
+\documentclass[a4paper,10pt]{article}
+
+% Packages
+\usepackage{mathtext}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage[left=2cm,right=2cm,
+    top=2cm,bottom=2cm,bindingoffset=0cm]{geometry}
+\usepackage{color}
+\usepackage{gensymb}
+
+\usepackage{enumitem}
+\setlist[enumerate]{label*=\arabic*.}
+
+\usepackage{indentfirst}
+
+\usepackage{titlesec}
+
+
+% Document
+\begin{document}
+
+    </ macro init_data(comb_geom) />
+    \begin{enumerate}
+        \item Низшая удельная теплота сгорания топлива: $ Q_н = << (comb_geom.Q_n / 10**6) | round(3) >> \cdot 10^6\ Дж/кг $.
+        \item Давление торможения на входе в диффузор: $ p_{вх}^* = << (comb_geom.p_stag_in / 10**6) | round(4) >> \cdot 10^6\  Па$.
+        \item Температура торможения на входе в диффузор: $ T_{вх}^* = << comb_geom.T_stag_in | round(2) >>\ К $.
+        \item Расход на входе в диффузор: $G_{вх} = << comb_geom.G_in | round(3) >>\ кг/с$.
+        \item Площадь сечения на входе в диффузор $ F_{вх} = << comb_geom.F_in | round(4) >>\ м^2 $.
+        \item Коэффициент полноты сгорания топлива: $eta_{г} = << comb_geom.eta_burn >>$.
+        \item Скорость на выходе из диффузора: $c_{д} = << comb_geom.c_d | round(2) >>\ м/с$.
+        \item Скорость в зоне горения: $c_I = << comb_geom.c1 | round(2) >>\ м/с$.
+        \item Теплонапряженность камеры сгорания: $H = << (comb_geom.H / 10**6) | round(3) >> \cdot10^6\ \frac{Дж}{ч \cdot м^3 \cdot Па}$.
+        \item Расход топлива в камере сгорания: $G_т = << comb_geom.G_fuel | round(3) >>\ кг/с$.
+        \item Средний диаметр на выходе из диффузора: $D_{д\ ср} = << comb_geom.D_d_av | round(3) >>\ м$.
+        \item Суммарный коэффициент избытка воздуха: $\alpha_{\Sigma} = << comb_geom.alpha_sum | round(3) >>$.
+        \item Коэффициент избытка воздуха в зоне горения: $\alpha_I = << comb_geom.alpha1 | round(3) >>$.
+        \item Число жаровых труб: $n = << comb_geom.n_pipe >>$.
+        \item Отношение длины зоны горения к длине жаровой трубы: $\frac{l_1}{l_ж} = << comb_geom.l1_rel | round(3) >>$.
+        \item Коэффициент сохранения полного давления в диффузоре: $\sigma_д = << comb_geom.sigma_d | round(3) >>$.
+        \item Коэффициент сохранения полного давления во фронтовом устройстве: $\sigma_ф = << comb_geom.sigma_front | round(3) >>$.
+        \item Скорость на входе в диффузор: $c_{вх} = << comb_geom.diffuser.c_in | round(3)>>\ м/с$.
+    \end{enumerate}
+    </ endmacro />
+
+    </ macro calc(comb_geom) />
+    \begin{enumerate}
+    	\item Полное давление на выходе из диффузор:
+    	\[
+    		p_д^* = p_{вх}^* \cdot \sigma_д = << (comb_geom.p_stag_in / 10**6) | round(4) >> \cdot 10^6 \cdot << comb_geom.sigma_d | round(3) >> = 
+    		<< (comb_geom.diffuser.p_stag_out / 10**6) | round(4) >>\ Па.
+    	\]
+
+    	\item Истинная теплоемкость воздуха на входе в диффузор:
+    	\[
+    		c_p = << comb_geom.diffuser.c_p | round(3) >>\ Дж/кг.
+    	\]
+
+    	\item Коэффициент адиабаты на входе в диффузор:
+    	\[
+    		k = << comb_geom.diffuser.k | round(3) >>.
+    	\]
+
+    	\item Температура торможения на выходе из диффузора:
+    	\[
+    		T_{д}^* = T_{вх}^* = << comb_geom.T_stag_in | round(2) >>\ К.
+    	\]
+
+    	\item Критическая скорость звук на выходе из диффузора:
+    	\[
+    		a_{кр\ д} = \sqrt{ \frac{2 \cdot k \cdot R \cdot T_{д}^*}{k + 1} } =
+    		\sqrt{ \frac{
+    				2 \cdot << comb_geom.diffuser.k | round(3) >> \cdot << comb_geom.work_fluid_in.R >> \cdot << comb_geom.T_stag_in | round(2) >>
+    				}{
+    				<< comb_geom.diffuser.k | round(3) >> + 1
+    		} } =
+    		<< comb_geom.diffuser.a_cr_out | round(2) >>\ м/с.
+    	\]
+
+    	\item Приведенная скорость на выходе из диффузора:
+    	\[
+    		\lambda_д = \frac{c_д}{a_{кр\ д}} = \frac{<< comb_geom.c_d | round(2) >>}{<< comb_geom.diffuser.a_cr_out | round(2) >>} = 
+    		<< comb_geom.diffuser.lam_out | round(3) >>.
+    	\]
+
+    	\item ГДФ температуры на выходе из диффузора:
+    	\[
+    		\tau_д =  1 - \frac{k - 1}{k + 1} \cdot {\lambda_д}^2  =  
+    		1 - \frac{<< comb_geom.diffuser.k | round(3) >> - 1}{<< comb_geom.diffuser.k | round(3) >> + 1} 
+    		\cdot {<< comb_geom.diffuser.lam_out | round(3) >>}^2  = 
+    		<< comb_geom.diffuser.tau_out | round(3) >>.
+    	\]
+
+    	\item ГДФ давления на выходе из диффузора:
+    	\[
+    		\pi_д = \left( \tau_д  \right) ^ \frac{k}{k -1} = 
+    		\left( 
+    			<< comb_geom.diffuser.tau_out | round(3) >>  
+    			\right) ^ \frac{<< comb_geom.diffuser.k | round(3) >>}{<< comb_geom.diffuser.k | round(3) >> -1} = 
+    		<< comb_geom.diffuser.pi_out | round(3) >>.
+    	\]
+
+    	\item Статическая температура на выходе из диффузора:
+    	\[
+    		T_{д} = T_{д}^* \cdot \tau_д = << comb_geom.T_stag_in | round(2) >> \cdot << comb_geom.diffuser.tau_out | round(3) >> = << comb_geom.diffuser.T_out | round(2) >>\ К.
+    	\]
+
+    	\item Статическое давление на выходе из диффузора:
+    	\[
+    		p_{д} = p_д^* \cdot \pi_д = << (comb_geom.diffuser.p_stag_out / 10**6) | round(4) >> \cdot << comb_geom.diffuser.pi_out | round(3) >> = 
+    		<< (comb_geom.diffuser.p_out / 10**6) | round(4) >>\ Па.
+    	\]
+
+    	\item Статическая плотность на выходе из диффузора:
+    	\[
+    		\rho_д = \frac{p_д}{R \cdot T_д} = 
+    		\frac{<< (comb_geom.diffuser.p_out / 10**6) | round(4) >> \cdot 10^6}{ << comb_geom.work_fluid_in.R >> \cdot << comb_geom.diffuser.T_out | round(2) >>} =
+    		<< comb_geom.diffuser.rho_out | round(3) >>\ кг/м^3.
+    	\]
+
+    	\item Площадь на выходе из диффузора:
+    	\[
+    		F_д = \frac{G_{вх}}{ c_д \cdot \rho_д } = \frac{<< comb_geom.G_in |round(2) >>
+    				}{ 
+    				<< comb_geom.c_d | round(2) >> \cdot << comb_geom.diffuser.rho_out | round(3) >> 
+    			} =
+    		<< comb_geom.diffuser.F_out | round(4) >>\ м^2. 
+    	\]
+
+    	\item Втулочный диаметр на выходе из диффузора:
+    	\[
+    		D_{д\ вт} = D_{д\ ср} - \frac{F_д}{\pi \cdot D_{д\ ср}} = 
+    		<< comb_geom.D_d_av | round(3) >> - \frac{<< comb_geom.diffuser.F_out | round(4) >>}{\pi \cdot << comb_geom.D_d_av | round(3) >>} = 
+    		<< comb_geom.diffuser.D_out_hub | round(3) >>\ м.
+    	\]
+
+    	\item Периферийный диаметр на выходе из диффузора:
+    	\[
+    		D_{д\ п} = D_{д\ ср} + \frac{F_д}{\pi \cdot D_{д\ ср}} = 
+    		<< comb_geom.D_d_av | round(3) >> + \frac{<< comb_geom.diffuser.F_out | round(4) >>}{\pi \cdot << comb_geom.D_d_av | round(3) >>} = 
+    		<< comb_geom.diffuser.D_out_per | round(3) >>\ м.
+    	\]
+
+    	\item Полное давление в зоне горения:
+    	\[
+    		p_I^* = p_д^* \cdot \sigma_ф = << (comb_geom.diffuser.p_stag_out / 10**6) | round(4) >> \cdot << comb_geom.sigma_front | round(3) >> = 
+    		<< (comb_geom.p_stag1 / 10**6) | round(4) >>
+    	\]
+
+    	\item Критическая скорость звука в зоне горения:
+    	\[
+    		a_{крI} = a_{кр\ д} =
+    		<< comb_geom.a_cr1 | round(2) >>\ м/с.
+    	\]
+
+    	\item Приведенная скорость в зоне горения:
+    	\[
+    		\lambda_I = \frac{c_I}{a_{кр\ д}} = \frac{<< comb_geom.c1 | round(2) >>}{<< comb_geom.a_cr1 | round(2) >>} = 
+    		<< comb_geom.lam1 | round(3) >>.
+    	\]
+
+    	\item ГДФ температуры в зоне горения:
+    	\[
+    		\tau_I =  1 - \frac{k - 1}{k + 1} \cdot {\lambda_I}^2  =  
+    		1 - \frac{<< comb_geom.diffuser.k | round(3) >> - 1}{<< comb_geom.diffuser.k | round(3) >> + 1} 
+    		\cdot {<< comb_geom.lam1 | round(3) >>}^2  = 
+    		<< comb_geom.tau1 | round(3) >>.
+    	\]
+
+    	\item ГДФ давления в зоне горения:
+    	\[
+    		\pi_I = \left( \tau_I  \right) ^ \frac{k}{k -1} = 
+    		\left( 
+    			<< comb_geom.tau1 | round(3) >>  
+    			\right) ^ \frac{<< comb_geom.diffuser.k | round(3) >>}{<< comb_geom.diffuser.k | round(3) >> -1} = 
+    		<< comb_geom.pi1 | round(3) >>.
+    	\]
+
+    	\item Статическая температура в зоне горения:
+    	\[
+    		T_{I} = T_{I}^* \cdot \tau_д = << comb_geom.T_stag_in | round(2) >> \cdot << comb_geom.tau1 | round(3) >> = << comb_geom.T1 | round(2) >>\ К.
+    	\]
+
+    	\item Статическое давление в зоне горения:
+    	\[
+    		p_{I} = p_I^* \cdot \pi_I = << (comb_geom.p_stag1 / 10**6) | round(4) >> \cdot << comb_geom.pi1 | round(3) >> = 
+    		<< (comb_geom.p1 / 10**6) | round(4) >>\ Па.
+    	\]
+
+    	\item Статическая плотность в зоне горения:
+    	\[
+    		\rho_I = \frac{p_I}{R \cdot T_I} = 
+    		\frac{<< (comb_geom.p1 / 10**6) | round(4) >> \cdot 10^6}{ << comb_geom.work_fluid_in.R >> \cdot << comb_geom.T1 | round(2) >>} =
+    		<< comb_geom.rho1 | round(3) >>\ кг/м^3.
+    	\]
+
+    	\item Расход в зоне горения:
+    	\[
+    		G_I = \frac{ \alpha_I }{ \alpha_\Sigma} \cdot G_{вх} = \frac{<< comb_geom.alpha1 | round(3) >>}{<< comb_geom.alpha_sum | round(3) >>} 
+    		\cdot << comb_geom.G_in | round(3) >> = << comb_geom.G1 | round(3) >>\ кг/с.
+    	\]
+
+    	\item Площадь поперечного сечения жаровой трубы:
+    	\[
+    		F_ж = \frac{ G_I }{n \cdot c_I \cdot \rho_I} = 
+    		\frac{
+    			<< comb_geom.G1 | round(3) >>
+    			}{
+    			<< comb_geom.n_pipe >> \cdot << comb_geom.c1 | round(3) >> \cdot << comb_geom.rho1 | round(3) >>
+    		} = << comb_geom.F_pipe | round(4) >>\ м^2.
+    	\]
+
+    	\item Диаметр жаровой трубы:
+    	\[
+    		d_ж = \sqrt{ \frac{4 \cdot F_ж}{ \pi } } = \sqrt{\frac{4 \cdot << comb_geom.F_pipe | round(4) >>}{ \pi }} =
+    		<< comb_geom.d_pipe | round(3) >>\ м.
+    	\]
+
+    	\item Объем жаровой трубы:
+    	\[
+    		V_ж = \frac{3600 \cdot Q_н \cdot G_т \cdot \eta_г}{H \cdot p_{вх}^* \cdot n} = 
+    		\frac{
+    			3600 \cdot << (comb_geom.Q_n / 10**6) | round(3) >> \cdot 10^6 \cdot << comb_geom.G_fuel | round(3) >> \cdot << comb_geom.eta_burn >>
+    				}{
+    			<< (comb_geom.H / 10**6) | round(3) >> \cdot 10^6 \cdot << (comb_geom.p_stag_in / 10**6) | round(4) >> \cdot << comb_geom.n_pipe >>
+    		} = 
+    		<< comb_geom.volume_pipe | round(4) >>\ м^3.
+    	\]
+
+    	\item Длина жаровой трубы:
+    	\[
+    		l_ж = \frac{V_ж}{F_ж} = \frac{<< comb_geom.volume_pipe | round(4) >>}{<< comb_geom.F_pipe | round(4) >>} =
+    		<< comb_geom.l_pipe | round(3) >>\ м.
+    	\]
+
+    	\item Длина зоны горения:
+    	\[
+    		l_I = l_ж \cdot \frac{l_1}{l_ж} = << comb_geom.l_pipe | round(3) >> \cdot << comb_geom.l1_rel | round(3) >>.
+    	\]
+
+     \end{enumerate}
+    </ endmacro />
+
+
+\end{document}

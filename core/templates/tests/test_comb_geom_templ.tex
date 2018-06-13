@@ -1,0 +1,47 @@
+%%
+%% Author: Alexander
+%% 12.06.2018
+%%
+
+% Preamble
+\documentclass[a4paper,10pt]{article}
+
+% Packages
+\usepackage{mathtext}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage[left=2cm,right=2cm,
+    top=2cm,bottom=2cm,bindingoffset=0cm]{geometry}
+\usepackage{color}
+\usepackage{gensymb}
+
+\usepackage{enumitem}
+\setlist[enumerate]{label*=\arabic*.}
+
+\usepackage{indentfirst}
+
+\usepackage{titlesec}
+
+
+
+% Document
+\begin{document}
+
+    \section{Исходные данные.}
+
+    </ import 'comb_geom.tex' as comb_geom_templ/>
+
+    << comb_geom_templ.init_data(comb_geom) >>
+
+    \section{Расчет.}
+
+    << comb_geom_templ.calc(comb_geom) >>
+
+
+\end{document}
